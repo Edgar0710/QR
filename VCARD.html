@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Código QR</title>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!-- Popper JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="text-center">Generador de QR VCARD</h1>
+    <div class="row ">
+      <div class="col-12 col-md-6  ">
+        <div class="form-group">
+          <label for="Contenido">Tamaño en Pixeles:</label>
+          <input class="form-control" id="txt_size"  type="number" value="500" />
+        </div>
+        <div class="form-group">
+          <label for="Contenido">Nombre:</label>
+          <input class="form-control" id="txt_name" />
+        </div>
+        <div class="form-group">
+          <label for="Contenido">Telefono:</label>
+          <input class="form-control" id="txt_phone" type="phone" />
+        </div>
+        <div class="form-group">
+          <label for="Contenido">Email:</label>
+          <input class="form-control" id="txt_email" type="email" />
+        </div>
+        <div class="d-none">
+
+          <div class="form-group">
+            <label for="Contenido">Organización:</label>
+            <input class="form-control" id="txt_org" />
+          </div>
+          <div class="form-group">
+            <label for="Contenido">Puesto:</label>
+            <input class="form-control" id="txt_puesto" />
+          </div>
+          <div class="form-group">
+            <label for="Contenido">Pagina:</label>
+            <input class="form-control" id="txt_url" />
+          </div>
+          <div class="form-group">
+            <label for="Contenido">Notas:</label>
+            <input class="form-control" id="txt_notas" />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-generate">Generar QR</button>
+        <a href="" class="btn btn-primary d-none" id="btn_download" download="Qr.png" target="_blank">Descargar QR</a>
+      </div>
+      <div class="col-12 col-md-6  ">
+        <div id="qr-code"></div>
+        <!-- <img src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=PoweByEdgar" alt="" id="img_qr" width="500" height="500"> -->
+      </div>
+    </div>
+
+  </div>
+
+
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <script>
+    // Datos de la vCard
+    var VcardGenerate = {
+      main: function () {
+        this.AddEvents();
+      },
+      AddEvents: function () {
+        $('.btn-generate').click(function () {
+          VcardGenerate.Generate();
+        });
+      },
+      Generate: function () {
+        var vCardData = "BEGIN:VCARD\nVERSION:3.0\n"
+          + "N:" + $("#txt_name").val() + ";;;\n"
+          + "FN:" + $("#txt_name").val() + "\n"
+          + "TEL;CELL:" + $("#txt_phone").val() + "\n"
+          + "TEL;CELL:" + $("#txt_phone").val() + "\n"
+          + "EMAIL;HOME:" + $("#txt_email").val() + "\n"
+          //+ "ORG;WORK:" + $("#txt_org").val() + "\n"
+          ///  + "TITLE:" + $("#txt_puesto").val()+ "\n"
+          ///+ "URL:" + $("#txt_url").val() + "\n"
+          // + "NOTE:" + $("#txt_notas").val() + "\n"
+          + "END:VCARD";
+        // Opciones para personalizar el código QR
+
+        // Configuración del código QR
+        var qrOptions = {
+          text: vCardData,
+          width: $("#txt_size").val(),
+          height: $("#txt_size").val(),
+          colorDark: "#000080", // Color azul oscuro
+          colorLight:"#00000000"// "#FFFFFF" // Color blanco para la parte clara del QR
+          ,correctLevel: QRCode.CorrectLevel.H // Nivel de corrección de errores
+        };
+        $("#qr-code").html("");
+        // Generar el código QR
+        var qrCode = new QRCode("qr-code", qrOptions);
+        var url = $("#qr-code").find("img").first().attr("src");
+        $('#btn_download').prop('href', url);
+      }
+    }
+
+
+
+    $(document).ready(function () { VcardGenerate.main() });
+
+  </script>
+</body>
+
+</html>
