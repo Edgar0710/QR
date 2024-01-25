@@ -24,6 +24,10 @@
           <label for="Contenido">Tamaño en Pixeles:</label>
           <input class="form-control" id="txt_size"  type="number" value="500" />
         </div>
+         <div class="form-group">
+          <label for="Contenido">Color QR HEX:</label>
+          <input class="form-control" id="txt_color"  type="text" value="#005cb9" />
+        </div>
         <div class="form-group">
           <label for="Contenido">Nombre:</label>
           <input class="form-control" id="txt_name" />
@@ -98,7 +102,7 @@
           text: vCardData,
           width: $("#txt_size").val(),
           height: $("#txt_size").val(),
-          colorDark: "#005cb9", // Color azul oscuro
+          colorDark: $("txt_color").val(), // Color azul oscuro
           colorLight:"#00000000"// "#FFFFFF" // Color blanco para la parte clara del QR
           ,correctLevel: QRCode.CorrectLevel.H // Nivel de corrección de errores
         };
