@@ -1,68 +1,148 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<!-- jQuery library -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<!-- Popper JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-<!-- Latest compiled JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Código QR</title>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!-- Popper JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
+
 <body>
-   <div class="container">
-       <h1 class="text-center">Generador de QR</h1>
-       <div class="row ">
-        <div class="col-12 col-md-6  ">
-            <div class="form-group">
-                <label for="wd">Ancho</label>
-                <input type="text" class="form-control" placeholder="ingresa el ancho" id="wd" value="500">
-              </div>
-              <div class="form-group">
-                <label for="hg">Alto</label>
-                <input type="tetx" class="form-control" placeholder="ingresa el alto" id="hg" value="500">
-              </div>
-              <div class="form-group">
-                <label for="Contenido">Contenido QR:</label>
-                <textarea class="form-control" rows="5" id="txt_qr"></textarea>
-              </div>
-              <button type="submit" class="btn btn-primary btn-generate" >Generar QR</button>
-              <a href="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=PoweByEdgar" class="btn btn-primary"id="btn_download" download="Qr" target="_blank">Descargar QR</a>
+  <div class="container">
+    <h1 class="text-center">Generador de Código QR</h1>
+    <div class="row">
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label for="qr_type">Tipo de QR:</label>
+          <select class="form-control" id="qr_type">
+            <option value="vcard">VCARD</option>
+            <option value="url">Enlace</option>
+            <option value="text">Texto</option>
+          </select>
         </div>
-        <div class="col-12 col-md-6  ">
-            <img src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=PoweByEdgar" alt="" id="img_qr" width="500" height="500">
-         </div>
-       </div>
+        <div class="form-group">
+          <label for="txt_size">Tamaño en Pixeles:</label>
+          <input class="form-control" id="txt_size" type="number" value="500" />
+        </div>
+        <div class="form-group">
+          <label for="txt_color">Color QR HEX:</label>
+          <input class="form-control" id="txt_color" type="text" value="#005cb9" />
+        </div>
+        <div id="vcard_fields" class="d-none">
+          <div class="form-group">
+            <label for="txt_name">Nombre:</label>
+            <input class="form-control" id="txt_name" />
+          </div>
+          <div class="form-group">
+            <label for="txt_phone">Teléfono:</label>
+            <input class="form-control" id="txt_phone" type="phone" />
+          </div>
+          <div class="form-group">
+            <label for="txt_email">Email:</label>
+            <input class="form-control" id="txt_email" type="email" />
+          </div>
+          <div class="form-group">
+            <label for="txt_org">Organización:</label>
+            <input class="form-control" id="txt_org" />
+          </div>
+          <div class="form-group">
+            <label for="txt_puesto">Puesto:</label>
+            <input class="form-control" id="txt_puesto" />
+          </div>
+          <div class="form-group">
+            <label for="txt_url_vcard">Página:</label>
+            <input class="form-control" id="txt_url_vcard" />
+          </div>
+          <div class="form-group">
+            <label for="txt_notas">Notas:</label>
+            <input class="form-control" id="txt_notas" />
+          </div>
+        </div>
+        <div class="form-group d-none" id="url_field">
+          <label for="txt_url">Enlace:</label>
+          <input class="form-control" id="txt_url" type="url" />
+        </div>
+        <div class="form-group d-none" id="text_field">
+          <label for="txt_text">Texto:</label>
+          <textarea class="form-control" id="txt_text"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-generate">Generar QR</button>
+        <a href="" class="btn btn-primary d-none" id="btn_download" download="Qr.png" target="_blank">Descargar QR</a>
+      </div>
+      <div class="col-12 col-md-6">
+        <div id="qr-code"></div>
+      </div>
+    </div>
+  </div>
 
-   </div>
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <script>
+    var QRGenerator = {
+      main: function () {
+        this.AddEvents();
+        this.ToggleFields();
+      },
+      AddEvents: function () {
+        $('.btn-generate').click(function () {
+          QRGenerator.Generate();
+        });
+        $('#qr_type').change(function () {
+          QRGenerator.ToggleFields();
+        });
+      },
+      ToggleFields: function () {
+        var type = $('#qr_type').val();
+        $('#vcard_fields').toggleClass('d-none', type !== 'vcard');
+        $('#url_field').toggleClass('d-none', type !== 'url');
+        $('#text_field').toggleClass('d-none', type !== 'text');
+      },
+      Generate: function () {
+        var type = $('#qr_type').val();
+        var qrData = '';
 
+        if (type === 'vcard') {
+          qrData = "BEGIN:VCARD\nVERSION:3.0\n"
+            + "N:" + $("#txt_name").val() + ";;;\n"
+            + "FN:" + $("#txt_name").val() + "\n"
+            + "TEL;CELL:" + $("#txt_phone").val() + "\n"
+            + "EMAIL;HOME:" + $("#txt_email").val() + "\n"
+            + "ORG;WORK:" + $("#txt_org").val() + "\n"
+            + "TITLE:" + $("#txt_puesto").val() + "\n"
+            + "URL:" + $("#txt_url_vcard").val() + "\n"
+            + "NOTE:" + $("#txt_notas").val() + "\n"
+            + "END:VCARD";
+        } else if (type === 'url') {
+          qrData = $("#txt_url").val();
+        } else if (type === 'text') {
+          qrData = $("#txt_text").val();
+        }
 
+        var qrOptions = {
+          text: qrData,
+          width: $("#txt_size").val(),
+          height: $("#txt_size").val(),
+          colorDark: $("#txt_color").val(),
+          colorLight: "#00000000",
+          correctLevel: QRCode.CorrectLevel.H
+        };
 
+        $("#qr-code").html("");
+        var qrCode = new QRCode("qr-code", qrOptions);
+        var url = $("#qr-code").find("img").first().attr("src");
+        $('#btn_download').prop('href', url).removeClass('d-none');
+      }
+    };
 
-
-<script>
- var QR ={
-     main:function(){
-         QR.addevent();
-     },
-     addevent:function(){
-         $('.btn-generate').click(function(){
-             var wd=$('#wd').val();
-             var hg=$('#hg').val();
-             var txt_qr=$('#txt_qr').val();
-             var url=`https://chart.googleapis.com/chart?chs=${wd}x${hg}&cht=qr&chl=${txt_qr}`;
-             $('#img_qr').attr('src',url);
-             $('#btn_download').attr('href',url);
-           //  console.log(url);
-         })
-     }
- }
-$(document).ready(function(){QR.main()});
-</script>    
+    $(document).ready(function () { QRGenerator.main(); });
+  </script>
 </body>
+
 </html>
